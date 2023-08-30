@@ -1,20 +1,16 @@
 import {
   Card,
-  Input,
   List,
-  Spinner,
   Typography,
 } from "@material-tailwind/react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import LocalStorageDB from "../../../services/helpers/LocalStorageDB";
 
 const ViewedPerson = () => {
-  const [viewedPerson, setViewedPerson] = useState([]);
+  const [viewedPerson, setViewedPerson] = useState<string[]>([]);
 
   useEffect(() => {
-    const viewedPersonString = sessionStorage.getItem("viewedPerson");
-    if (viewedPersonString) {
-      setViewedPerson(JSON.parse(viewedPersonString));
-    }
+      setViewedPerson(LocalStorageDB.read('viewedPerson'));
   }, []);
 
   return (

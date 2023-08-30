@@ -10,37 +10,35 @@ import {
   ListItem,
   Spinner,
 } from "@material-tailwind/react";
-import { useContext, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import {useContext, useEffect, useState} from "react";
+import {useNavigate, useParams} from "react-router-dom";
 import photo from "./img/team-3.jpg";
-import { getPeopleById } from "../../API/get-people-by-id";
-import { People } from "../../models/People";
-import { SwapContext , ThemeContext } from "../../../App";
+import {getPeopleById} from "../../../services/API/get-people-by-id";
+import {People} from "../../../services/models/People";
+import {PersonContext} from "../../../App";
 
 export default function Person() {
   const navigate = useNavigate();
-  const { personAll, setPersonAll } = useContext(ThemeContext)
-  
+  const {personAll, setPersonAll} = useContext(PersonContext);
+
   const goBack = () => {
     navigate("/");
   };
 
   const [people, setPeople] = useState<People>();
 
-  const { personId } = useParams();
+  const {personId} = useParams();
 
   useEffect(() => {
     if (personId) {
       if (personAll[parseInt(personId)]) {
         setPeople(personAll[parseInt(personId)]);
-      }
-      else {
+      } else {
         getPeopleById(personId).then((people) => {
           setPeople(people);
         });
       }
     }
-
   }, []);
 
   return (

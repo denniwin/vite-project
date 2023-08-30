@@ -1,36 +1,30 @@
-import { useContext, useEffect, useState } from "react";
-import {
-  List,
-  Card,
-  Typography,
-  Spinner,
-  Input,
-} from "@material-tailwind/react";
-import { ListPersonItem } from "./ListPersonItem";
-import { People, Visited } from "../../models/People";
-import { GetPeople } from "../../API/people.api";
-import { ThemeContext } from "../../../App";
-import useDebouncedFunction from "../../helpers/Debounced";
+import {useContext, useEffect, useState} from "react";
+import {List, Card, Typography, Spinner, Input} from "@material-tailwind/react";
+import {ListPersonItem} from "./ListPersonItem";
+import {People, Visited} from "../../../services/models/People";
+import {GetPeople} from "../../../services/API/people.api";
+import {PersonContext} from "../../../App";
+import useDebouncedFunction from "../../../services/helpers/Debounced";
+import LocalStorageDB from "../../../services/helpers/LocalStorageDB";
 
 export default function ListPerson() {
-  const [visited, setVisited] = useState<Visited[]>([]);
+  const [visited, setVisited] = useState<string[]>([]);
   const [personSort, setPersonSort] = useState<People[]>([]);
-  const { personAll, setPersonAll } = useContext(ThemeContext);
+  const {personAll, setPersonAll} = useContext(PersonContext);
 
   useEffect(() => {
-    const storedVisited = sessionStorage.getItem("viewedPerson");
-    if (storedVisited) {
-      setVisited(JSON.parse(storedVisited));
-    }
+      setVisited(LocalStorageDB.read('viewedPerson'));
   }, []);
 
-  const saveVisit = (name: Visited) => {
+  const saveVisit = (name: string) => {
     if (!visited.includes(name)) {
       const updatedVisited = [...visited, name];
       setVisited(updatedVisited);
-      sessionStorage.setItem("viewedPerson", JSON.stringify(updatedVisited));
+      LocalStorageDB.write("viewedPerson", updatedVisited)
     }
   };
+
+
   useEffect(() => {
     GetPeople()
       .then((peoples) => {
@@ -51,8 +45,12 @@ export default function ListPerson() {
     );
   };
 
-  const debouncedHandletextChange = useDebouncedFunction(handletextChange, 300, true)
-  
+  const debouncedHandletextChange = useDebouncedFunction(
+    handletextChange,
+    300,
+    true
+  );
+
   return (
     <div className="relative flex flex-col items-center justify-center h-screen">
       <div className="w-96 fixed top-20 bg-white z-40">
@@ -61,7 +59,7 @@ export default function ListPerson() {
           className="bg-blue"
           onChange={debouncedHandletextChange}
           id="search"
-          labelProps={{ htmlFor: "search" }}
+          labelProps={{htmlFor: "search"}}
         />
       </div>
       {personSort.length === 0 ? (
