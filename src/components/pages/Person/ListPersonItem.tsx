@@ -3,25 +3,24 @@ import {
     List,
     ListItem,
     ListItemPrefix,
-    Avatar,
-    Card,
     Typography,
   } from "@material-tailwind/react";
 import { NavLink } from 'react-router-dom';
+import { People} from '../../models/People';
 
 
-export const ListPersonItem = ({ name, created, id, saveVisit }: any) => {
+export const ListPersonItem = ({ data, id, saveVisit }: { data: People, id: number, saveVisit: (name: string) => void}) => {
 
   return (
     <div>
-          <NavLink onClick={() => saveVisit(name)} to={`/person/${id+1}`}>
+          <NavLink onClick={() => saveVisit(data.name)} to={`/person/${id+1}`}>
           <ListItem>
         <div>
           <Typography variant="h6" color="blue-gray">
-            {name}
+            {data.name}
           </Typography>
           <Typography variant="small" color="gray" className="font-normal">
-            Created {created.slice(0, 10)}
+            Created {data.created.slice(0, 10)}
           </Typography>
         </div>
       </ListItem>

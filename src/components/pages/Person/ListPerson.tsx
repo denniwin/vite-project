@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   List,
   Card,
@@ -7,13 +7,15 @@ import {
   Input,
 } from "@material-tailwind/react";
 import { ListPersonItem } from "./ListPersonItem";
-import { People, Visited } from "../models/People";
-import { GetPeople } from "../API/people.api";
+import { People, Visited } from "../../models/People";
+import { GetPeople } from "../../API/people.api";
+import { ThemeContext } from "../../../App";
+import useDebouncedFunction from "../../helpers/Debounced";
 
 export default function ListPerson() {
   const [visited, setVisited] = useState<Visited[]>([]);
   const [personSort, setPersonSort] = useState<People[]>([]);
-  const [personAll, setPersonAll] = useState<People[]>([]);
+  const { personAll, setPersonAll } = useContext(ThemeContext);
 
   useEffect(() => {
     const storedVisited = sessionStorage.getItem("viewedPerson");
@@ -22,14 +24,13 @@ export default function ListPerson() {
     }
   }, []);
 
-  const saveVisit = (name: never) => {
+  const saveVisit = (name: Visited) => {
     if (!visited.includes(name)) {
       const updatedVisited = [...visited, name];
       setVisited(updatedVisited);
       sessionStorage.setItem("viewedPerson", JSON.stringify(updatedVisited));
     }
   };
-
   useEffect(() => {
     GetPeople()
       .then((peoples) => {
@@ -41,22 +42,24 @@ export default function ListPerson() {
       });
   }, []);
 
-  const handletextChange = (event: any) => {
+  const handletextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const inputText = event.target.value;
     setPersonSort(
-      personAll.filter((item: any) =>
+      personAll.filter((item: People) =>
         item.name.toLowerCase().includes(inputText.toLowerCase())
       )
     );
   };
 
+  const debouncedHandletextChange = useDebouncedFunction(handletextChange, 300, true)
+  
   return (
     <div className="relative flex flex-col items-center justify-center h-screen">
       <div className="w-96 fixed top-20 bg-white z-40">
         <Input
           label="Поиск по ключевым словам"
-          className="bg-blue "
-          onChange={handletextChange}
+          className="bg-blue"
+          onChange={debouncedHandletextChange}
           id="search"
           labelProps={{ htmlFor: "search" }}
         />
@@ -74,8 +77,7 @@ export default function ListPerson() {
                 <ListPersonItem
                   saveVisit={saveVisit}
                   key={index}
-                  name={item.name}
-                  created={item.created}
+                  data={item}
                   id={index}
                 />
               ))}

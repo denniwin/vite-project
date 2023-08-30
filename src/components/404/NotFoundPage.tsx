@@ -1,6 +1,3 @@
-import React from "react";
-import ThemeContext from '../../App'
-
 const NotFoundPage = () => {
 
   return (
