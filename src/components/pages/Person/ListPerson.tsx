@@ -1,7 +1,7 @@
 import {useContext, useEffect, useState} from "react";
 import {List, Card, Typography, Spinner, Input} from "@material-tailwind/react";
 import {ListPersonItem} from "./ListPersonItem";
-import {People, Visited} from "../../../services/models/People";
+import {People} from "../../../services/models/People";
 import {GetPeople} from "../../../services/API/people.api";
 import {PersonContext} from "../../../App";
 import useDebouncedFunction from "../../../services/helpers/Debounced";
@@ -9,11 +9,11 @@ import LocalStorageDB from "../../../services/helpers/LocalStorageDB";
 
 export default function ListPerson() {
   const [visited, setVisited] = useState<string[]>([]);
-  const [personSort, setPersonSort] = useState<People[]>([]);
-  const {personAll, setPersonAll} = useContext(PersonContext);
+  const { personAll, setPersonAll } = useContext(PersonContext);
+  const [personSort, setPersonSort] = useState<People[]>(personAll);
 
   useEffect(() => {
-      setVisited(LocalStorageDB.read('viewedPerson'));
+    setVisited(LocalStorageDB.read('viewedPerson'));    
   }, []);
 
   const saveVisit = (name: string) => {
@@ -24,16 +24,18 @@ export default function ListPerson() {
     }
   };
 
-
   useEffect(() => {
-    GetPeople()
-      .then((peoples) => {
-        setPersonAll(peoples);
-        setPersonSort(peoples);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+
+    if (personAll.length === 0) {
+      GetPeople()
+    .then((peoples) => {
+      setPersonAll(peoples);
+      setPersonSort(peoples);
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+}
   }, []);
 
   const handletextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
